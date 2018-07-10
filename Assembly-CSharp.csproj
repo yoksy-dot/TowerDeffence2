@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Assets\Script\BattleObserve.cs" />
     <Compile Include="Assets\Script\HeroBase.cs" />
+    <Compile Include="Assets\Script\MyUnit.cs" />
     <Compile Include="Assets\Script\TerrainBase.cs" />
     <Compile Include="Assets\Script\UniteBase.cs" />
     <Reference Include="UnityEditor.StandardEvents">

@@ -15,12 +15,24 @@ public class UniteBase : MonoBehaviour {
 	protected float HP;
 	[SerializeField]
 	protected float ATK;
-	[SerializeField]
-	protected float DEF;
+	//[SerializeField]
+	//protected float DEF;
 	[SerializeField]
 	protected float SPEED;
 	[SerializeField,Tooltip("兵数")]
 	protected int NUMBER;
+
+
+	public float _HP
+	{
+		set { HP = value; }
+		get { return HP; }
+	}
+	public int _NUMBER
+	{
+		set { NUMBER = value; }
+		get { return NUMBER; }
+	}
 
 	public string _NAME
 	{
@@ -42,19 +54,32 @@ public class UniteBase : MonoBehaviour {
 	protected StringBuilder sb;
 
 	[SerializeField]
-	private LineRenderer _Line;
+	protected LineRenderer _Line;
 
 	//[SerializeField]
 	//private GameObject UI_Panel;
 	[SerializeField]
-	private Text ui_Name,ui_HP,ui_Atk,ui_Def,ui_Speed,ui_num,ui_rank;
+	private Text ui_Name;
+	[SerializeField]
+	private Text ui_HP;
+	[SerializeField]
+	private Text ui_Atk;
+	//[SerializeField]
+	//private Text ui_Def;
+	[SerializeField]
+	private Text ui_Speed;
+	[SerializeField]
+	private Text ui_num;
+	[SerializeField]
+	private Text ui_rank;
 
-	Vector3 screenPos, ArrowPos;
-	Vector2 AnsVec,startpos;
-	Vector3 vec;
+	protected Vector3 screenPos, ArrowPos;
+	protected Vector2 AnsVec,startpos;
+	protected Vector3 vec;
 
-	private string terr = "Terrain";
-	private bool DragFlag = false;
+	
+	private const string terr = "Terrain";
+	protected bool DragFlag = false , ReTurn = false;
 
 	private float timer = 0;
 	//float startTime;
@@ -81,80 +106,113 @@ public class UniteBase : MonoBehaviour {
 		if(IsMove)
 			timer += Time.deltaTime;
 
-		if (GOTarget != null && DragFlag)
+		if (GOTarget != null && (DragFlag || ReTurn))
 		{
-			IsMove = true;
-			//Move_distance += SPEED;
+			
+			MovingFarst();
+			
 			if (MoveTime <= timer)//移動完了時
 			{
 				IsMove = false;
-				transform.localPosition = GOTarget.transform.localPosition;
-				startpos = transform.localPosition;
-				NowPos = GOTarget;
-				GOTarget = null;
+				//transform.localPosition = GOTarget.transform.localPosition;
+				//startpos = transform.localPosition;
+				//NowPos = GOTarget;
+				//GOTarget = null;
 				DragFlag = false;
+				//ReTurn = false;
 				timer = 0;
+
+				//Debug.Log("おわったーん");
+				if (!ReTurn)
+				{
+					//到着後戦闘判定
+					if (GOTarget.Garrison.Count > 0)
+						GOTarget.battleObserve.BattleCalculate(GOTarget.Garrison, this);
+					if (NUMBER <= 0)
+					{
+						Debug.Log("さよならー");
+						Destroy(gameObject);
+						return;
+					}
+
+					//戦闘後、全滅させることができなければ撤退する
+					if (GOTarget.Garrison.Count > 0)
+					{
+						IsMove = true;
+						//Debug.Log("かえります");
+						num = Array.IndexOf(GOTarget.Node, NowPos);
+
+						Target_dis = GOTarget.Way[num];
+						DragFlag = false;
+						ReTurn = true;
+						MoveTime = Target_dis / SPEED;//残り時間計算
+						Vector2 move_vec = NowPos.transform.localPosition - transform.localPosition;
+
+						transform.localRotation = Quaternion.FromToRotation(Vector2.up, move_vec);
+
+					}
+					else //占領成功
+					{
+						//Debug.Log("いすわり！");
+						transform.localPosition = GOTarget.transform.localPosition;
+						startpos = transform.localPosition;
+						NowPos.MoveGarrison.Remove(this);//元の場所の移動兵力枠から消去
+						NowPos = GOTarget;
+						GOTarget = null;
+						ReTurn = false;
+						NowPos.Garrison.Add(this);
+					}
+				}
+				else
+				{
+					//Debug.Log("そんなー");
+					//到着後戦闘判定
+					if (NowPos.Garrison.Count > 0)
+						NowPos.battleObserve.BattleCalculate(NowPos.Garrison, this);
+					//戦闘後、全滅させることができなければ消滅する
+					if (NowPos.Garrison.Count > 0)
+					{
+						Destroy(gameObject);
+					}
+					else //帰還成功
+					{
+						//Debug.Log("ただいま！");
+						transform.localPosition = NowPos.transform.localPosition;
+						startpos = transform.localPosition;
+						//NowPos = GOTarget;
+						GOTarget = null;
+						ReTurn = false;
+						NowPos.Garrison.Add(this);
+						NowPos.MoveGarrison.Remove(this);
+					}
+
+				}
+
 			}
 			else if (MoveTime > timer)
 			{
-				float gg = Mathf.InverseLerp(0, MoveTime, Time.deltaTime);
-				transform.localPosition = Vector2.Lerp(transform.localPosition, GOTarget.transform.localPosition, gg);
+				float gg = Mathf.InverseLerp(0, MoveTime, timer);
+				if (!ReTurn)
+				{
+					//Debug.Log(gg);
+					AnsVec = Vector2.Lerp(NowPos.transform.localPosition, GOTarget.transform.localPosition, gg);
+					transform.localPosition = AnsVec;
+				}
+
+				else
+				{
+					AnsVec = Vector2.Lerp(GOTarget.transform.localPosition, NowPos.transform.localPosition, gg);
+					transform.localPosition = AnsVec;
+				}
 			}
 		}
 	}
 
-	protected float  UnitAtkCalculate(float atk, int num)
+	protected virtual void MovingFarst()
 	{
-		switch (num)
-		{
-			case 1:
-				return atk * num * 1;
-			case 2:
-				return atk * num * 0.98f;
-			case 3:
-				return atk * num * 0.95f;
-			case 4:
-				return atk * num * 0.92f;
-			case 5:
-				return atk * num * 0.88f;
-			case 6:
-				return atk * num * 0.83f;
-			case 7:
-				return atk * num * 0.77f;
-			case 8:
-				return atk * num * 0.71f;
-			case 9:
-				return atk * num * 0.66f;
-			case 10:
-				return atk * num * 0.60f;
-		}
-		Debug.Log("ユニット数バグ");
-		return 0;
-	}
-
-	public void DragFunc()
-	{
-		if (IsMove)
-			return;
-		_Line.gameObject.SetActive(true);
-		screenPos = Input.mousePosition;
-		screenPos.z = 10.0f;
-		AnsVec = Camera.main.ScreenToWorldPoint(screenPos);
-
-		transform.localPosition = AnsVec;
-		_Line.SetPosition(0, startpos);
-		_Line.SetPosition(1, AnsVec);
-		
-	}
-
-	public void EndDragFunc()
-	{
-		if (IsMove)
-			return;
-		_Line.gameObject.SetActive(false);
-		transform.localPosition = startpos;
-		DragFlag = true;
-
+		IsMove = true;
+		NowPos.Garrison.Remove(this);
+		NowPos.MoveGarrison.Add(this);//移動中の枠に移す
 	}
 
 	public void ClickGunc()
@@ -179,10 +237,10 @@ public class UniteBase : MonoBehaviour {
 		ui_Atk.text = sb.ToString();
 		sb.Length = 0;
 
-		sb.Append("DEF:");
-		sb.Append(DEF);
-		ui_Def.text = sb.ToString();
-		sb.Length = 0;
+		//sb.Append("DEF:");
+		//sb.Append(DEF);
+		//ui_Def.text = sb.ToString();
+		//sb.Length = 0;
 
 		sb.Append("SPEED:");
 		sb.Append(SPEED);
@@ -215,9 +273,9 @@ public class UniteBase : MonoBehaviour {
 		ui_Atk.text = sb.ToString();
 		sb.Length = 0;
 
-		sb.Append("DEF:");
-		ui_Def.text = sb.ToString();
-		sb.Length = 0;
+		//sb.Append("DEF:");
+		//ui_Def.text = sb.ToString();
+		//sb.Length = 0;
 
 		sb.Append("SPEED:");
 		ui_Speed.text = sb.ToString();
@@ -236,13 +294,20 @@ public class UniteBase : MonoBehaviour {
 	{
 		if (IsMove)
 			return;
+		//Debug.Log("asdhfj");
 		GameObject _collobj = coll.gameObject;
 		if (_collobj != NowPos.gameObject && _collobj.CompareTag(terr))
 		{
 			GOTarget = _collobj.GetComponent<TerrainBase>();
 
 			num = Array.IndexOf(NowPos.Node, GOTarget);
-			Target_dis = GOTarget.Way[num];
+			if(num < 0)
+			{
+				GOTarget = null;
+				return;
+			}
+
+			Target_dis = NowPos.Way[num];
 			DragFlag = false;
 			MoveTime = Target_dis / SPEED;//残り時間計算
 			Vector2 move_vec = GOTarget.transform.localPosition - transform.localPosition;
@@ -255,10 +320,40 @@ public class UniteBase : MonoBehaviour {
 
 	private void OnTriggerExit2D(Collider2D coll)
 	{
-		if (coll.gameObject.CompareTag(terr) && !DragFlag)
+		if (coll.gameObject.CompareTag(terr) && !(DragFlag || ReTurn))
 		{
 			//DragFlag = false;
 			GOTarget = null;
 		}
+	}
+
+	public virtual float UnitAtkCalculate()
+	{
+		float a = ATK * NUMBER;
+		switch (NUMBER)
+		{
+			case 1:
+				return a * 1;
+			case 2:
+				return a * 0.98f;
+			case 3:
+				return a * 0.95f;
+			case 4:
+				return a * 0.92f;
+			case 5:
+				return a * 0.88f;
+			case 6:
+				return a * 0.83f;
+			case 7:
+				return a * 0.77f;
+			case 8:
+				return a * 0.71f;
+			case 9:
+				return a * 0.66f;
+			case 10:
+				return a * 0.60f;
+		}
+		Debug.Log("ユニット数バグ");
+		return 0;
 	}
 }

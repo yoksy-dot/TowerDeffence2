@@ -80,6 +80,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NAME: Hoge
+  IsOccupation: 0
+  _sp: {fileID: 212308813297872750}
   Buff_ATK: 0
   Buff_DEF: 0
   Buff_SPEED: 0
@@ -88,6 +90,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  MoveGarrison: []
   Node:
   - {fileID: 0}
   - {fileID: 0}
@@ -102,6 +105,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  _Line: {fileID: 0}
 --- !u!114 &114526659863282784
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -137,6 +141,40 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 114267868804720440}
           m_MethodName: PointerExitFunc
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  - eventID: 5
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114267868804720440}
+          m_MethodName: DragFunc
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  - eventID: 14
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114267868804720440}
+          m_MethodName: EndDragFunc
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
