@@ -26,7 +26,7 @@ GameObject:
   - component: {fileID: 50668893059695522}
   m_Layer: 0
   m_Name: TestArmy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -175,7 +175,6 @@ MonoBehaviour:
   RANK: 1
   HP: 10
   ATK: 5
-  DEF: 2
   SPEED: 4
   NUMBER: 10
   NowPos: {fileID: 0}
@@ -184,7 +183,6 @@ MonoBehaviour:
   ui_Name: {fileID: 0}
   ui_HP: {fileID: 0}
   ui_Atk: {fileID: 0}
-  ui_Def: {fileID: 0}
   ui_Speed: {fileID: 0}
   ui_num: {fileID: 0}
   ui_rank: {fileID: 0}

@@ -6,10 +6,11 @@ public class BattleObserve
 {
 	private List<UniteBase> Attacker = new List<UniteBase>();
 	private List<UniteBase> Diffender = new List<UniteBase>();
-	//private TerrainBase _base;
 
-	float[] A = new float[3];
-	float[] D = new float[3];
+	private const int Battle_num = 10;//とりま10で
+
+	float[] A = new float[Battle_num];
+	float[] D = new float[Battle_num];
 
 	//戦闘場所と攻撃者のデータ
 	public BattleObserve(TerrainBase Current)
@@ -17,7 +18,7 @@ public class BattleObserve
 		//_base = Current;
 	}
 
-	public void BattleCalculate(List<UniteBase> _Diffender, List<UniteBase> _Attacker)
+	public void BattleCalculate(List<UniteBase> _Diffender, List<UniteBase> _Attacker,TerrainBase BattleZone)
 	{
 		//Debug.Log("dddd");
 		//初期化
@@ -30,18 +31,12 @@ public class BattleObserve
 
 		for (int i = 0; i < Attacker.Count; i++)
 		{
-			if (!Attacker[i])
-				A[i] = Attacker[i].UnitAtkCalculate();//攻撃側攻撃力計算
-			else//消したい
-				A[i] = 0;
+			A[i] = Attacker[i].UnitAtkCalculate() * ((100 - BattleZone.B_DEF) / 100);//攻撃側攻撃力計算 バフはダメージカット
 		}
 
 		for (int i = 0; i < Diffender.Count; i++)
 		{
-			if (!Diffender[i])
-				D[i] = Diffender[i].UnitAtkCalculate();//防御側攻撃力計算
-			else
-				D[i] = 0;
+			D[i] = Diffender[i].UnitAtkCalculate() * ((BattleZone.B_ATK + 100) / 100);//防御側攻撃力計算　バフは攻撃力上昇
 		}
 
 		//このへん攻撃受ける側が少ないとダメージが変に減ってる気がする
@@ -51,15 +46,20 @@ public class BattleObserve
 		{
 			for (int j = 0; j < Attacker.Count; j++)
 			{
-				if(Diffender.Count == 1)
+				if (Diffender.Count == 1)
 				{
 					//一人のときは当然すべて受ける
 					Battle(Diffender[i], A[j]);
 				}
-				else
+				else if (i < 2)
 				{
 					//0番目は攻撃力の2/3を受ける
 					Battle(Diffender[i], (A[j] / 3) * (2 - i));
+				}
+				else
+				{
+					Debug.Log("aaaaaa");
+					//処理なし
 				}
 			}
 		}
@@ -69,8 +69,15 @@ public class BattleObserve
 		{
 			for (int j = 0; j < Diffender.Count; j++)
 			{
-				//0番目は攻撃力の2/3を受ける
-				Battle(Attacker[i], (A[j] / 3) * (2 - i));
+				if (i < 2)
+				{
+					//0番目は攻撃力の2/3を受ける
+					Battle(Attacker[i], (A[j] / 3) * (2 - i));
+				}
+				else
+				{
+					Debug.Log("bbbbbbbb");
+				}
 				if (Attacker.Count == 1)
 					Debug.Log("戦闘システムに以上あり");
 			}
@@ -81,19 +88,19 @@ public class BattleObserve
 		//値を返却
 		for (int i = 0; i < Diffender.Count; i++)
 		{
-			if (Diffender[i] && Diffender[i]._HP > 0)
+			if (Diffender[i]._NUMBER > 0)
 				_Diffender.Add(Diffender[i]);
 		}
 		for (int i = 0; i < Attacker.Count; i++)
 		{
-			if (Attacker[i] && Attacker[i]._HP > 0)
+			if (Attacker[i]._NUMBER > 0)
 				_Attacker.Add(Attacker[i]);
 		}
 
 	}
 
 	//一人攻撃用
-	public void BattleCalculate(List<UniteBase> _Diffender, UniteBase _Attacker)
+	public void BattleCalculate(List<UniteBase> _Diffender, UniteBase _Attacker, TerrainBase BattleZone)
 	{
 		//Debug.Log("oson");
 		//初期化
@@ -106,13 +113,12 @@ public class BattleObserve
 
 
 
-		A[0] = Attacker[0].UnitAtkCalculate();//攻撃側攻撃力計算
-		//Debug.Log("A:" + A[0]);
+		A[0] = Attacker[0].UnitAtkCalculate() * ((100 - BattleZone.B_DEF) / 100);//攻撃側攻撃力計算 バフはダメージカット
 
 		for (int i = 0; i < Diffender.Count; i++)
 		{
 			if (Diffender[i] != null)
-				D[i] = Diffender[i].UnitAtkCalculate();//防御側攻撃力計算
+				D[i] = Diffender[i].UnitAtkCalculate() * ((BattleZone.B_ATK + 100) / 100);//防御側攻撃力計算　バフは攻撃力上昇
 			else
 				D[i] = 0;
 		}

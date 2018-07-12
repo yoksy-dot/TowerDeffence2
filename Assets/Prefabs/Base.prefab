@@ -38,7 +38,7 @@ Transform:
   m_GameObject: {fileID: 1550233782674052}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -6.26, y: -1.63, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -84,8 +84,6 @@ MonoBehaviour:
   _sp: {fileID: 212308813297872750}
   Buff_ATK: 0
   Buff_DEF: 0
-  Buff_SPEED: 0
-  UnitNum: 0
   Garrison:
   - {fileID: 0}
   - {fileID: 0}
@@ -100,7 +98,6 @@ MonoBehaviour:
   ui_name: {fileID: 0}
   ui_buff_atk: {fileID: 0}
   ui_buff_def: {fileID: 0}
-  ui_buff_speed: {fileID: 0}
   ui_buff_sta:
   - {fileID: 0}
   - {fileID: 0}
